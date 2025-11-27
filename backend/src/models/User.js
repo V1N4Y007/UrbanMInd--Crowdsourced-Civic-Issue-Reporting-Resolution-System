@@ -8,9 +8,11 @@ const userSchema = new mongoose.Schema(
     password: String,
     role: {
       type: String,
-      enum: ["citizen", "admin", "contractor"],
+      enum: ["citizen", "admin", "contractor", "superadmin"],
       default: "citizen",
     },
+    city: { type: String }, // For City Admins
+    isSuperAdmin: { type: Boolean, default: false },
     points: { type: Number, default: 0 },
   },
   { timestamps: true }

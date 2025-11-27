@@ -18,6 +18,7 @@ const issueSchema = new mongoose.Schema(
       lng: Number,
       address: String,
     },
+    city: { type: String }, // To assign to City Admin
     upvotes: { type: Number, default: 0 },
     contractorId: mongoose.Schema.Types.ObjectId,
   },
