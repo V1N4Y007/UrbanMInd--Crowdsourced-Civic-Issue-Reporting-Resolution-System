@@ -48,6 +48,9 @@ export const AuthProvider = ({ children }) => {
                 case 'contractor':
                     navigate('/contractor/dashboard');
                     break;
+                case 'superadmin':
+                    navigate('/superadmin/dashboard');
+                    break;
                 default:
                     navigate('/');
             }
