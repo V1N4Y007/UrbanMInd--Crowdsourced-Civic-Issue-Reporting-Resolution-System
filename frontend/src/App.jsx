@@ -21,6 +21,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import IssueList from './pages/admin/IssueList';
 import ContractorList from './pages/admin/ContractorList';
 import Analytics from './pages/admin/Analytics';
+import SuperAdminDashboard from './pages/admin/SuperAdminDashboard';
 
 import ContractorDashboard from './pages/contractor/Dashboard';
 
@@ -68,6 +69,21 @@ function App() {
                       <Route path="issues" element={<IssueList />} />
                       <Route path="contractors" element={<ContractorList />} />
                       <Route path="analytics" element={<Analytics />} />
+                      <Route path="*" element={<Navigate to="dashboard" replace />} />
+                    </Routes>
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Super Admin Routes */}
+            <Route
+              path="/superadmin/*"
+              element={
+                <ProtectedRoute allowedRoles={['superadmin']}>
+                  <Layout>
+                    <Routes>
+                      <Route path="dashboard" element={<SuperAdminDashboard />} />
                       <Route path="*" element={<Navigate to="dashboard" replace />} />
                     </Routes>
                   </Layout>
