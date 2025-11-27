@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Card from '../../components/common/Card';
-import { issueService } from '../../api/services';
+import { issueService } from '../../api/services/issueService';
 
 const ReportIssue = () => {
     const navigate = useNavigate();

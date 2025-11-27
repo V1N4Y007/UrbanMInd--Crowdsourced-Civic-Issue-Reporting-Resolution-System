@@ -5,7 +5,7 @@ import { ArrowLeft, MapPin, Calendar, User, Clock, CheckCircle, AlertTriangle } 
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import Loader from '../../components/common/Loader';
-import { issueService } from '../../api/services';
+import { issueService } from '../../api/services/issueService';
 
 const IssueDetails = () => {
     const { id } = useParams();

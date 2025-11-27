@@ -4,7 +4,7 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import { User, Mail, Phone, MapPin, Award } from 'lucide-react';
-import { userService } from '../../api/services';
+import { authService } from '../../api/services/authService';
 
 const Profile = () => {
     const { user } = useAuth();
@@ -14,7 +14,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const data = await userService.getProfile();
+                const data = await authService.me();
                 setProfile(data);
             } catch (error) {
                 console.error('Failed to fetch profile:', error);
@@ -97,7 +97,7 @@ const Profile = () => {
                                     <span className="text-blue-400 font-bold">450 Points</span>
                                 </div>
                                 <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r from-blue-600 to-purple-600 w-[75%]" />
+                                    <div className="h-full bg-linear-to-r from-blue-600 to-purple-600 w-[75%]" />
                                 </div>
                                 <p className="text-sm text-gray-500 mt-2">50 points to next level</p>
                             </div>

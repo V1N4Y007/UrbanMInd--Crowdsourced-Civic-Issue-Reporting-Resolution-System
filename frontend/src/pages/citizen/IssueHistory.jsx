@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
-import { issueService } from '../../api/services';
+import { issueService } from '../../api/services/issueService';
 
 const IssueHistory = () => {
     const [issues, setIssues] = useState([]);
