@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
-const Layout = () => {
+const Layout = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -11,9 +11,9 @@ const Layout = () => {
             <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-            <main className="pt-16 lg:pl-64 min-h-screen transition-all duration-300">
+            <main className="pt-16 lg:pl-72 min-h-screen transition-all duration-300">
                 <div className="p-4 lg:p-8 max-w-7xl mx-auto">
-                    <Outlet />
+                    {children}
                 </div>
             </main>
         </div>
