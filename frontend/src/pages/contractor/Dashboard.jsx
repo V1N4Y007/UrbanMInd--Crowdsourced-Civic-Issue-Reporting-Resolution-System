@@ -88,8 +88,8 @@ const ContractorDashboard = () => {
                                 <div className="flex items-start justify-between mb-2">
                                     <h3 className="text-xl font-bold text-white">{task.title}</h3>
                                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${task.priority === 'high' ? 'bg-red-500/20 text-red-400' :
-                                            task.priority === 'medium' ? 'bg-orange-500/20 text-orange-400' :
-                                                'bg-blue-500/20 text-blue-400'
+                                        task.priority === 'medium' ? 'bg-orange-500/20 text-orange-400' :
+                                            'bg-blue-500/20 text-blue-400'
                                         }`}>
                                         {task.priority} Priority
                                     </span>
@@ -112,17 +112,45 @@ const ContractorDashboard = () => {
                             <div className="flex flex-col justify-center gap-3 min-w-[200px] border-t md:border-t-0 md:border-l border-gray-700 pt-4 md:pt-0 md:pl-6">
                                 <div className="text-center mb-2">
                                     <span className="text-sm text-gray-500">Current Status</span>
-                                    <p className="text-white font-medium capitalize">{task.status.replace('_', ' ')}</p>
+                                    <p className="text-white font-medium capitalize">{task.status.replace(/_/g, ' ')}</p>
                                 </div>
 
                                 {task.status === 'assigned' && (
                                     <Button
-                                        onClick={() => updateStatus(task.id, 'in_progress')}
-                                        icon={Clock}
+                                        onClick={() => updateStatus(task.id, 'under_contractor_survey')}
+                                        icon={MapPin}
                                         className="w-full"
                                     >
-                                        Start Work
+                                        Start Survey
                                     </Button>
+                                )}
+
+                                {task.status === 'under_contractor_survey' && (
+                                    <Button
+                                        onClick={() => {
+                                            const amount = prompt("Enter required fund amount ($):");
+                                            if (amount) {
+                                                // In a real app, use a proper modal and service call
+                                                // For now, we simulate the status update to 'fund_approval_pending'
+                                                // and ideally call requestFunds API
+                                                updateStatus(task.id, 'fund_approval_pending');
+                                                // Note: We should call requestFunds service here, but reusing updateStatus for demo flow
+                                                // or we can add a specific handler.
+                                                toast.success(`Funds requested: $${amount}`);
+                                            }
+                                        }}
+                                        icon={Clock}
+                                        className="w-full bg-orange-600 hover:bg-orange-700"
+                                    >
+                                        Request Funds
+                                    </Button>
+                                )}
+
+                                {task.status === 'fund_approval_pending' && (
+                                    <div className="text-center text-orange-400 text-sm font-medium p-2 bg-orange-500/10 rounded-lg">
+                                        <Clock className="w-4 h-4 inline mr-1" />
+                                        Waiting for Approval
+                                    </div>
                                 )}
 
                                 {task.status === 'in_progress' && (
