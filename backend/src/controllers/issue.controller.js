@@ -1,35 +1,36 @@
 import Issue from "../models/Issue.js";
 import { classifyImage } from "../utils/aiClassifier.js";
+import fetch from "node-fetch";
+
 
 export const createIssue = async (req, res) => {
   try {
     const { title, description, lat, lng, address } = req.body;
 
-    // Uploaded Image
     const imageFile = req.files?.image;
     let imageUrl = "";
     if (imageFile) {
       imageUrl = `/uploads/${Date.now()}_${imageFile.name}`;
-      imageFile.mv("." + imageUrl);
+      await imageFile.mv("." + imageUrl);
     }
 
-    // AI Classification (Mocked or Real)
-    // const category = await classifyImage("." + imageUrl);
-    const category = "General"; // Fallback if AI fails or not implemented fully
-
-    // Determine City from Coordinates (Mock Logic for Demo)
-    // In a real app, use Google Maps Geocoding API or OpenStreetMap
-    const city = getCityFromCoordinates(lat, lng);
+    // 🔥 Real reverse geocoding
+    const city = await getCityFromCoordinates(lat, lng);
 
     const issue = await Issue.create({
       userId: req.user.id,
       title,
       description,
       imageUrl,
-      category,
+      category: "General",
       gps: { lat, lng, address },
-      city: city
+      city
     });
+
+    const user = await User.findById(req.user.id);
+    user.impactPoints += 10;
+    user.citizenLevel = Math.floor(user.impactPoints / 100) + 1;
+    await user.save();
 
     res.json({ message: "Issue reported", issue });
   } catch (err) {
@@ -37,14 +38,101 @@ export const createIssue = async (req, res) => {
   }
 };
 
-// Mock Reverse Geocoding
-const getCityFromCoordinates = (lat, lng) => {
-  // Simple mock logic based on ranges or just random for demo
-  // Ideally, the frontend sends the city, or we use a real API.
-  // For this demo, let's assume if lat > 40 it's "New York", else "Los Angeles"
-  // Or better, just default to "New York" for the demo flow unless specified.
 
-  // If the user provided an address string containing a city, we could parse it.
-  // But let's just default to "New York" for the primary demo case.
-  return "New York";
+export const getAllIssues = async (req, res) => {
+  try {
+    // In a real app, we might filter by city if the user is a city admin
+    // For now, return all issues sorted by newest first
+    const issues = await Issue.find().sort({ createdAt: -1 });
+    res.json(issues);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const requestFunds = async (req, res) => {
+  try {
+    const { issueId, amount } = req.body;
+    const issue = await Issue.findById(issueId);
+
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
+
+    issue.fundAmount = amount;
+    issue.status = "fund_approval_pending";
+    await issue.save();
+
+    res.json({ message: "Funds requested successfully", issue });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const approveFunds = async (req, res) => {
+  try {
+    const { issueId } = req.body;
+    const issue = await Issue.findById(issueId);
+
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
+
+    // Logic: If amount > 1000, only Super Admin can approve
+    if (issue.fundAmount > 1000 && req.user.role !== 'superadmin') {
+      return res.status(403).json({ message: "Amount exceeds limit. Requires Super Admin approval." });
+    }
+
+    issue.fundApproved = true;
+    issue.status = "in_progress"; // Funds approved, work starts
+    await issue.save();
+
+    res.json({ message: "Funds approved. Work can start.", issue });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Mock Reverse Geocoding
+export const getCityFromCoordinates = async (lat, lng) => {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10&addressdetails=1`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    return (
+      data?.address?.city ||
+      data?.address?.town ||
+      data?.address?.village ||
+      data?.address?.suburb ||
+      data?.address?.state_district ||
+      data?.address?.county ||
+      "Unknown City"
+    );
+  } catch (error) {
+    console.log("Reverse geocoding failed:", error);
+    return "Unknown City";
+  }
+};
+
+
+
+export const getIssueById = async (req, res) => {
+  try {
+    const issue = await Issue.findById(req.params.id);
+
+    if (!issue) {
+      return res.status(404).json({ message: "Issue not found" });
+    }
+
+    res.json(issue);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+export const getMyIssues = async (req, res) => {
+  try {
+    const issues = await Issue.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json(issues);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };

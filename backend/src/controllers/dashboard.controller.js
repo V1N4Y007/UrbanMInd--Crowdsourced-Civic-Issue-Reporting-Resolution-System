@@ -22,10 +22,16 @@ export const getCitizenStats = async (req, res) => {
 export const getCitizenRecentIssues = async (req, res) => {
   try {
     const userId = req.user.id;
+    const role = req.user.role;
 
-    const issues = await Issue.find({ userId })
+    let query = { userId };
+    if (role === 'contractor') {
+      query = { contractorId: userId };
+    }
+
+    const issues = await Issue.find(query)
       .sort({ createdAt: -1 })
-      .limit(5);
+      .limit(20); // Increased limit for contractors to see more tasks
 
     res.json(issues);
   } catch (err) {
