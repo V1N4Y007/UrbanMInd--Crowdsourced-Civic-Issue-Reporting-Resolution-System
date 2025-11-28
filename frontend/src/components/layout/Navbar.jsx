@@ -7,7 +7,7 @@ const Navbar = ({ toggleSidebar }) => {
     const { user, logout } = useAuth();
 
     return (
-        <nav className="bg-gray-800 border-b border-gray-700 h-16 flex items-center justify-between px-4 lg:px-6 fixed top-0 w-full z-40">
+        <nav className="bg-slate-900/80 backdrop-blur-md border-b border-white/10 h-16 flex items-center justify-between px-4 lg:px-6 fixed top-0 w-full z-40 shadow-sm">
             <div className="flex items-center gap-4">
                 <button
                     onClick={toggleSidebar}
@@ -16,7 +16,7 @@ const Navbar = ({ toggleSidebar }) => {
                     <Menu className="w-6 h-6" />
                 </button>
                 <Link to="/" className="text-xl font-bold text-white flex items-center gap-2">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
                         <span className="text-white text-lg">U</span>
                     </div>
                     <span className="hidden sm:block">Urban Mind</span>
