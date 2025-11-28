@@ -14,6 +14,7 @@ const CitizenDashboard = () => {
         pending: 0,
         resolved: 0,
     });
+
     const [recentIssues, setRecentIssues] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -24,21 +25,16 @@ const CitizenDashboard = () => {
                     dashboardService.getStats(),
                     issueService.getMyIssues({ limit: 5 })
                 ]);
+
                 setStats(statsData);
                 setRecentIssues(issuesData);
             } catch (error) {
                 console.error('Failed to fetch dashboard data:', error);
-                // Fallback to mock data on error for demo purposes
-                setStats({ total: 12, pending: 4, resolved: 8 });
-                setRecentIssues([
-                    { id: 1, title: 'Pothole on Main St', status: 'pending', date: '2023-10-25' },
-                    { id: 2, title: 'Broken Streetlight', status: 'resolved', date: '2023-10-20' },
-                    { id: 3, title: 'Garbage Dump', status: 'in_progress', date: '2023-10-22' },
-                ]);
             } finally {
                 setLoading(false);
             }
         };
+
         fetchData();
     }, []);
 
@@ -57,6 +53,7 @@ const CitizenDashboard = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
             >
+                {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
@@ -106,12 +103,16 @@ const CitizenDashboard = () => {
                     </Card>
                 </div>
 
-                {/* Recent Activity */}
+                {/* Recent Reports */}
                 <h2 className="text-xl font-bold text-white mb-4">Recent Reports</h2>
                 <div className="grid gap-4">
+                    {recentIssues.length === 0 && (
+                        <p className="text-gray-400">No recent reports found.</p>
+                    )}
+
                     {recentIssues.map((issue, index) => (
                         <motion.div
-                            key={issue.id}
+                            key={issue._id}  // FIXED KEY
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
@@ -119,15 +120,19 @@ const CitizenDashboard = () => {
                             <Card hover className="flex items-center justify-between p-4">
                                 <div>
                                     <h4 className="font-medium text-white mb-1">{issue.title}</h4>
-                                    <p className="text-sm text-gray-400">{issue.date}</p>
+                                    <p className="text-sm text-gray-400">
+                                        {new Date(issue.createdAt).toLocaleDateString()}
+                                    </p>
                                 </div>
+
                                 <span
-                                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${issue.status === 'resolved'
-                                        ? 'bg-green-500/10 text-green-500'
-                                        : issue.status === 'pending'
+                                    className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                                        issue.status === 'resolved'
+                                            ? 'bg-green-500/10 text-green-500'
+                                            : issue.status === 'pending'
                                             ? 'bg-orange-500/10 text-orange-500'
                                             : 'bg-blue-500/10 text-blue-500'
-                                        }`}
+                                    }`}
                                 >
                                     {issue.status.replace('_', ' ')}
                                 </span>

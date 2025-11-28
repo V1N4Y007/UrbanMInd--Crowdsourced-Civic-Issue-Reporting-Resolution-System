@@ -35,7 +35,7 @@ const MapView = () => {
     };
 
     return (
-        <div className="h-[calc(100vh-8rem)] rounded-2xl overflow-hidden border border-gray-700 shadow-2xl relative">
+        <div className="h-[75vh] w-full block rounded-3xl overflow-hidden border border-gray-700 shadow-2xl relative bg-gray-900 z-0">
             <Map
                 mapLib={maplibregl}
                 initialViewState={{

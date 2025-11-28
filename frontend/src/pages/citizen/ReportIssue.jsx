@@ -13,23 +13,25 @@ const ReportIssue = () => {
     const fileInputRef = useRef(null);
 
     const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        category: 'pothole',
-        latitude: '',
-        longitude: '',
+        title: "",
+        description: "",
+        category: "pothole",
+        lat: "",
+        lng: "",
+        address: "",
     });
+
     const [image, setImage] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [loading, setLoading] = useState(false);
     const [locationLoading, setLocationLoading] = useState(false);
 
     const categories = [
-        { value: 'pothole', label: 'Pothole' },
-        { value: 'garbage', label: 'Garbage Dump' },
-        { value: 'streetlight', label: 'Broken Streetlight' },
-        { value: 'water', label: 'Water Leakage' },
-        { value: 'other', label: 'Other' },
+        { value: "pothole", label: "Pothole" },
+        { value: "garbage", label: "Garbage Dump" },
+        { value: "streetlight", label: "Broken Streetlight" },
+        { value: "water", label: "Water Leakage" },
+        { value: "other", label: "Other" },
     ];
 
     const handleChange = (e) => {
@@ -47,32 +49,55 @@ const ReportIssue = () => {
     const removeImage = () => {
         setImage(null);
         setPreviewUrl(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+
+    // ⭐ Fetch Address Using OpenStreetMap Reverse Geocoding
+    const fetchAddressFromCoordinates = async (lat, lng) => {
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+            );
+            const data = await res.json();
+
+            const address =
+                data?.display_name ||
+                data?.address?.city ||
+                data?.address?.town ||
+                data?.address?.village ||
+                "Unknown Location";
+
+            setFormData((prev) => ({
+                ...prev,
+                address: address,
+            }));
+        } catch (err) {
+            console.log("Error fetching address:", err);
         }
     };
 
+    // ⭐ Fetch GPS + Address
     const getLocation = () => {
         setLocationLoading(true);
-        if (!navigator.geolocation) {
-            toast.error('Geolocation is not supported by your browser');
-            setLocationLoading(false);
-            return;
-        }
 
         navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setFormData({
-                    ...formData,
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                });
-                toast.success('Location fetched successfully');
+            async (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                setFormData((prev) => ({
+                    ...prev,
+                    lat,
+                    lng,
+                }));
+
+                await fetchAddressFromCoordinates(lat, lng);
+
+                toast.success("Location fetched");
                 setLocationLoading(false);
             },
-            (error) => {
-                console.error(error);
-                toast.error('Unable to retrieve your location');
+            () => {
+                toast.error("Unable to fetch location");
                 setLocationLoading(false);
             }
         );
@@ -84,22 +109,22 @@ const ReportIssue = () => {
 
         try {
             const data = new FormData();
-            data.append('title', formData.title);
-            data.append('description', formData.description);
-            data.append('category', formData.category);
-            data.append('latitude', formData.latitude);
-            data.append('longitude', formData.longitude);
-            if (image) {
-                data.append('image', image);
-            }
+            data.append("title", formData.title);
+            data.append("description", formData.description);
+            data.append("category", formData.category);
+            data.append("lat", formData.lat);
+            data.append("lng", formData.lng);
+            data.append("address", formData.address);
+
+            if (image) data.append("image", image);
 
             await issueService.create(data);
 
-            toast.success('Issue reported successfully!');
-            navigate('/citizen/dashboard');
+            toast.success("Issue Reported Successfully!");
+            navigate("/citizen/dashboard");
         } catch (error) {
             console.error(error);
-            toast.error('Failed to report issue');
+            toast.error("Failed to report issue");
         } finally {
             setLoading(false);
         }
@@ -109,11 +134,12 @@ const ReportIssue = () => {
         <div className="max-w-2xl mx-auto">
             <div className="mb-6">
                 <h1 className="text-3xl font-bold text-white mb-2">Report an Issue</h1>
-                <p className="text-gray-400">Help us improve the city by reporting problems.</p>
+                <p className="text-gray-400">Help improve the city by reporting issues.</p>
             </div>
 
             <Card>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Title */}
                     <Input
                         label="Title"
                         name="title"
@@ -123,15 +149,14 @@ const ReportIssue = () => {
                         required
                     />
 
+                    {/* Category */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                            Category
-                        </label>
+                        <label className="block text-sm text-gray-300 mb-1">Category</label>
                         <select
                             name="category"
                             value={formData.category}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            className="w-full px-4 py-2 bg-gray-800 border-gray-700 rounded-xl text-white"
                         >
                             {categories.map((cat) => (
                                 <option key={cat.value} value={cat.value}>
@@ -141,97 +166,100 @@ const ReportIssue = () => {
                         </select>
                     </div>
 
+                    {/* Description */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                            Description
-                        </label>
+                        <label className="block text-sm text-gray-300 mb-1">Description</label>
                         <textarea
                             name="description"
                             rows="4"
-                            placeholder="Describe the issue in detail..."
+                            placeholder="Describe the issue…"
+                            className="w-full px-4 py-2 bg-gray-800 border-gray-700 rounded-xl text-white"
                             value={formData.description}
                             onChange={handleChange}
-                            className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
                             required
                         />
                     </div>
 
                     {/* Location */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                            Location
-                        </label>
-                        <div className="flex gap-2">
-                            <div className="flex-1 grid grid-cols-2 gap-2">
-                                <Input
-                                    placeholder="Latitude"
-                                    name="latitude"
-                                    value={formData.latitude}
-                                    readOnly
-                                    className="bg-gray-900/50"
-                                />
-                                <Input
-                                    placeholder="Longitude"
-                                    name="longitude"
-                                    value={formData.longitude}
-                                    readOnly
-                                    className="bg-gray-900/50"
-                                />
-                            </div>
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={getLocation}
-                                isLoading={locationLoading}
-                                icon={MapPin}
-                            >
-                                Fetch GPS
-                            </Button>
+                        <label className="block text-sm text-gray-300 mb-1">Location</label>
+
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                            <Input
+                                label="Latitude"
+                                value={formData.lat}
+                                readOnly
+                                className="bg-gray-900"
+                            />
+                            <Input
+                                label="Longitude"
+                                value={formData.lng}
+                                readOnly
+                                className="bg-gray-900"
+                            />
                         </div>
+
+                        <Input
+                            label="Address"
+                            value={formData.address}
+                            readOnly
+                            className="bg-gray-900"
+                        />
+
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={getLocation}
+                            className="mt-2"
+                            isLoading={locationLoading}
+                            icon={MapPin}
+                        >
+                            Fetch GPS
+                        </Button>
                     </div>
 
                     {/* Image Upload */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                            Upload Image
-                        </label>
+                        <label className="block text-sm text-gray-300 mb-1">Upload Image</label>
+
                         <div
-                            className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${previewUrl ? 'border-blue-500 bg-blue-500/5' : 'border-gray-700 hover:border-gray-500'
-                                }`}
+                            className={`border-2 border-dashed rounded-xl p-6 text-center ${
+                                previewUrl ? "border-blue-500 bg-blue-500/5" : "border-gray-700"
+                            }`}
                         >
                             {previewUrl ? (
                                 <div className="relative inline-block">
                                     <img
                                         src={previewUrl}
+                                        className="max-h-64 rounded-lg"
                                         alt="Preview"
-                                        className="max-h-64 rounded-lg shadow-lg"
                                     />
                                     <button
                                         type="button"
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
                                         onClick={removeImage}
-                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
                                     >
                                         <X className="w-4 h-4" />
                                     </button>
                                 </div>
                             ) : (
                                 <div
-                                    onClick={() => fileInputRef.current?.click()}
                                     className="cursor-pointer"
+                                    onClick={() => fileInputRef.current?.click()}
                                 >
                                     <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
                                         <Camera className="w-6 h-6 text-gray-400" />
                                     </div>
-                                    <p className="text-gray-300 font-medium">Click to upload image</p>
-                                    <p className="text-gray-500 text-sm mt-1">JPG, PNG up to 5MB</p>
+                                    <p className="text-gray-300">Click to upload image</p>
                                 </div>
                             )}
+
                             <input
                                 ref={fileInputRef}
                                 type="file"
                                 accept="image/*"
-                                onChange={handleImageChange}
                                 className="hidden"
+                                onChange={handleImageChange}
                             />
                         </div>
                     </div>
@@ -242,8 +270,8 @@ const ReportIssue = () => {
                             variant="primary"
                             className="w-full"
                             size="lg"
-                            isLoading={loading}
                             icon={Upload}
+                            isLoading={loading}
                         >
                             Submit Report
                         </Button>
