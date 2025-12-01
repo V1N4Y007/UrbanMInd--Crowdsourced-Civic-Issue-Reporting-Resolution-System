@@ -57,7 +57,7 @@ const RoleSelect = () => {
                 className="relative z-10 text-center mb-16"
             >
                 <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">
-                    Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Urban Mind</span>
+                    Welcome to <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-indigo-400">Urban Mind</span>
                 </h1>
                 <p className="text-slate-300 text-xl max-w-2xl mx-auto leading-relaxed">
                     Connecting citizens, contractors, and administrators for a better urban environment.
@@ -93,7 +93,7 @@ const RoleSelect = () => {
                             <p className="text-slate-400 text-lg leading-relaxed">{role.description}</p>
 
                             {/* Hover Glow Effect */}
-                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="absolute inset-0 rounded-3xl bg-linear-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         </div>
                     </motion.div>
                 ))}
