@@ -82,7 +82,7 @@ const ContractorDashboard = () => {
 
             {/* Financial & Performance Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <Card className="p-6 bg-linear-to-br from-green-900/40 to-gray-900 border-green-500/20">
+                <Card className="p-6 bg-gradient-to-br from-green-900/40 to-gray-900 border-green-500/20">
                     <div className="flex items-center gap-4 mb-2">
                         <div className="p-3 rounded-xl bg-green-500/20 text-green-400">
                             <DollarSign className="w-6 h-6" />
@@ -92,7 +92,7 @@ const ContractorDashboard = () => {
                     <p className="text-3xl font-bold text-white">${stats.totalEarnings.toLocaleString()}</p>
                 </Card>
 
-                <Card className="p-6 bg-linear-to-br from-orange-900/40 to-gray-900 border-orange-500/20">
+                <Card className="p-6 bg-gradient-to-br from-orange-900/40 to-gray-900 border-orange-500/20">
                     <div className="flex items-center gap-4 mb-2">
                         <div className="p-3 rounded-xl bg-orange-500/20 text-orange-400">
                             <Clock className="w-6 h-6" />
@@ -102,7 +102,7 @@ const ContractorDashboard = () => {
                     <p className="text-3xl font-bold text-white">${stats.pendingFunds.toLocaleString()}</p>
                 </Card>
 
-                <Card className="p-6 bg-linear-to-br from-blue-900/40 to-gray-900 border-blue-500/20">
+                <Card className="p-6 bg-gradient-to-br from-blue-900/40 to-gray-900 border-blue-500/20">
                     <div className="flex items-center gap-4 mb-2">
                         <div className="p-3 rounded-xl bg-blue-500/20 text-blue-400">
                             <Activity className="w-6 h-6" />
@@ -112,7 +112,7 @@ const ContractorDashboard = () => {
                     <p className="text-3xl font-bold text-white">{activeTasks.length}</p>
                 </Card>
 
-                <Card className="p-6 bg-linear-to-br from-purple-900/40 to-gray-900 border-purple-500/20">
+                <Card className="p-6 bg-gradient-to-br from-purple-900/40 to-gray-900 border-purple-500/20">
                     <div className="flex items-center gap-4 mb-2">
                         <div className="p-3 rounded-xl bg-purple-500/20 text-purple-400">
                             <TrendingUp className="w-6 h-6" />
