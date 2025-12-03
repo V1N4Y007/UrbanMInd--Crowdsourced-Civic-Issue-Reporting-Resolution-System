@@ -13,18 +13,33 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const checkAuth = async () => {
-            const token = localStorage.getItem('token');
-            const savedUser = localStorage.getItem('user');
+    const checkAuth = () => {
+        const token = localStorage.getItem("token");
+        const rawUser = localStorage.getItem("user");
 
-            if (token && savedUser) {
-                setUser(JSON.parse(savedUser));
-                // Optional: Verify token with backend
-            }
+        // If no token → user is logged out
+        if (!token || !rawUser || rawUser === "undefined" || rawUser === "null") {
+            setUser(null);
             setLoading(false);
-        };
-        checkAuth();
-    }, []);
+            return;
+        }
+
+        try {
+            const parsedUser = JSON.parse(rawUser);
+            setUser(parsedUser);
+        } catch (error) {
+            console.error("Invalid user JSON:", error);
+            // Clear corrupted data
+            localStorage.removeItem("user");
+            setUser(null);
+        }
+
+        setLoading(false);
+    };
+
+    checkAuth();
+}, []);
+
 
     const login = async (email, password) => {
         try {
