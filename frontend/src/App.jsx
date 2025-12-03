@@ -8,6 +8,7 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import RoleSelect from './pages/auth/RoleSelect';
+import Landing from './pages/Landing';
 
 import CitizenDashboard from './pages/citizen/Dashboard';
 import ReportIssue from './pages/citizen/ReportIssue';
@@ -34,10 +35,10 @@ function App() {
           <Toaster position="top-right" />
           <Routes>
             {/* Public Routes */}
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/role-select" element={<RoleSelect />} />
-            <Route path="/" element={<Navigate to="/role-select" replace />} />
 
             {/* Citizen Routes */}
             <Route
